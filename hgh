@@ -1,0 +1,30 @@
+def foo[T](v: List[T])(implicit i: T => Ordered[T]): List[T] = {
+    def t: (List[T] => (List[T], List[T])) = {
+      case Nil => (Nil, Nil)
+      case b :: Nil => (b :: Nil, Nil)
+      case c :: d :: e =>
+        val (f, g) = t(e)
+        (c :: f, d :: g)
+    }
+
+    def l(q: List[T], t: List[T]): List[T] =
+      (q, t) match {
+        case (c, Nil) => c
+        case (Nil, d) => d
+        case (e :: f, g :: h) =>
+          if (e > g)
+            g :: l(q, h)
+          else
+            e :: l(f, t)
+      }
+
+    v match {
+      case Nil | _ :: Nil =>
+        v
+      case _ =>
+        val (a, b) = t(v)
+        val c = foo(a)
+        val d = foo(b)
+        l(c, d)
+    }
+}
